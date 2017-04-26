@@ -1,0 +1,63 @@
+
+{% block title %}View Auction Event{% endblock %}
+
+
+
+
+{% block content %}
+    <h2>{{ auction_event.item.title }}</h2>
+    {% if auction_event.is_running %}
+        <div id='defaultCountdown'></div>
+    {% else %}
+        {% if not auction_event.has_started %}
+            <div class="info">Auction hasn't started yet.</div>
+        {% endif %}
+        {% if auction_event.has_ended %}
+            <div class="info">
+                This auction has ended.
+                {% ifequal auction_event.winning_bidder request.user.user %}
+                    Congratulations! You won this auction.
+                {% endifequal %}
+            </div>
+        {% endif %}
+    {% endif %}
+    {% ifequal auction_event.item.seller request.user %}
+        <div class='info'>You are selling this item.</div>
+    {% endifequal %}
+    <p><strong>Current Price: </strong>${{ auction_event.get_current_price }}</p>
+    
+    <p><strong>Shipping Fee: </strong>${{ auction_event.shipping_fee }}</p>
+    
+    <p><strong>Condition: </strong>{{ auction_event.item.get_condition }}</p>
+    
+    <p><strong>Seller: </strong>{{ auction_event.item.seller.username }}</p>
+    
+    <p><strong>Category: </strong>{{ auction_event.item.category }}</p>
+    
+    <p><strong>Shipping Method: </strong>{{ auction_event.get_shipping_method }}</p>
+    
+    <p><strong>End Time: </strong>{{ auction_event.end_time|date:"g:i A, j N Y" }}</p>
+    
+    {% if auction_event.shipping_detail %}
+        <p><strong>Shipping Detail: </strong>{{ auction_event.shipping_detail }}</p>
+    {% endif %}
+    
+    {% if auction_event.shipping_detail %}
+        <p><strong>Payment Detail: </strong>{{ auction_event.payment_detail }}</p>
+    {% endif %}
+    
+    <p>{{ auction_event.bids.count }} bid(s) placed. <a href="{% url 'view_bid_history' auction_event.pk %}">View bid history.</a></p>
+    {% if auction_event.is_running %}
+        {% ifnotequal auction_event.item.seller request.user %}
+            {% if form %}
+                <form action="." method="post">{% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" value="Place Bid" />
+                </form>    
+            {% endif %}
+        {% endifnotequal %}
+    {% endif %}
+    <hr />
+    <h3>Description:</h3>
+    {{ auction_event.item.description|safe }}</p>
+{% endblock %}

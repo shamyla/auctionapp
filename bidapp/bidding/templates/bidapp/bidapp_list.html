@@ -1,0 +1,7 @@
+{% block content %}
+    <form action="." method="post" >{% csrf_token %}
+        {{ item_form.as_p }}
+        {{ auction_form.as_p }}
+        <p><input type="submit" value="List Item" /></p>
+    </form>
+{% endblock %}
